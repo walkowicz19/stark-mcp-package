@@ -302,7 +302,7 @@ Add to your `claude_desktop_config.json`:
     "stark-orchestrator": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/orchestrator/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/orchestrator/build/index.js"
       ]
     }
   }
@@ -316,13 +316,13 @@ Add to your `claude_desktop_config.json`:
     "stark-security": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/security-guardrails/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/security-guardrails/build/index.js"
       ]
     },
     "stark-codegen": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/code-generation/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/code-generation/build/index.js"
       ]
     }
   }
