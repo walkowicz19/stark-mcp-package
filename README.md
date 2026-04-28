@@ -166,8 +166,6 @@ Analyze massive repositories with semantic understanding:
 - **Symbol References**: Find all usages across the codebase
 - **Complexity Metrics**: Identify refactoring priorities
 
-**[Learn More →](docs/LARGE_SCALE_CAPABILITIES.md#code-intelligence-50gb-repositories)**
-
 ### 🗄️ Database Schema Intelligence (12 Tools)
 
 Comprehensive database analysis and optimization:
@@ -178,8 +176,6 @@ Comprehensive database analysis and optimization:
 - **Index Optimization**: AI-powered suggestions with impact scores
 - **ERD Generation**: Mermaid, PlantUML, Graphviz formats
 - **Data Profiling**: Quality checks and statistical analysis
-
-**[Learn More →](docs/LARGE_SCALE_CAPABILITIES.md#schema-intelligence-complex-databases)**
 
 ### 🏛️ Advanced Legacy System Analysis (18 Tools)
 
@@ -193,8 +189,6 @@ Modernize COBOL, mainframe, and legacy systems:
 - **AI-Powered Modernization**: Migration strategies with cost estimates
 - **Comprehensive Reporting**: Executive and technical documentation
 
-**[Learn More →](docs/LARGE_SCALE_CAPABILITIES.md#legacy-system-analysis)**
-
 ### 🧠 Large-Scale Context Management (14 Tools)
 
 Store and retrieve massive analysis contexts:
@@ -205,8 +199,6 @@ Store and retrieve massive analysis contexts:
 - **Context Merging**: Combine multiple sources intelligently
 - **Multi-Domain Support**: Code, schemas, legacy systems
 
-**[Learn More →](docs/LARGE_SCALE_CAPABILITIES.md#context-management)**
-
 ### 🎼 Unified Orchestration (17 High-Level Tools)
 
 Coordinate complex multi-service workflows:
@@ -215,8 +207,6 @@ Coordinate complex multi-service workflows:
 - `stark_analyze_database_system`: Full database assessment
 - `stark_modernize_legacy_system`: Legacy system modernization
 - `stark_full_system_assessment`: Complete system evaluation
-
-**[Learn More →](docs/LARGE_SCALE_CAPABILITIES.md#orchestration)**
 
 ### 📈 Performance Metrics
 
@@ -228,15 +218,6 @@ Coordinate complex multi-service workflows:
 | 1000 Table Extraction | <10 minutes | 8-9 minutes |
 | 700+ File Legacy Analysis | <30 minutes | 25-28 minutes |
 | Context Retrieval (p95) | <500ms | 400-480ms |
-
-### 📚 Documentation
-
-- **[Complete Guide](docs/LARGE_SCALE_CAPABILITIES.md)**: Comprehensive documentation
-- **[Quick Start](docs/QUICK_START_LARGE_SCALE.md)**: Get started in 5 minutes
-- **[Use Case Examples](docs/examples/LARGE_SCALE_EXAMPLES.md)**: Real-world scenarios
-- **[API Reference](docs/API_REFERENCE_LARGE_SCALE.md)**: Complete API documentation
-
----
 
 ## 🚀 Quick Start
 
