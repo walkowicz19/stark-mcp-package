@@ -11,9 +11,9 @@ A collection of 9 specialized MCP servers that extend AI assistants like Claude 
 
 ---
 
-## 🌟 What is Stark MCP?
+## 🌟 What is Stark?
 
-Stark MCP is a suite of **production-ready MCP servers** that transform AI assistants into comprehensive development platforms. Each server provides specialized tools that can be used independently or orchestrated together for complex workflows.
+Stark is a suite of **production-ready MCP servers** that transform AI assistants into comprehensive development platforms. Each server provides specialized tools that can be used independently or orchestrated together for complex workflows.
 
 ### Key Features
 
