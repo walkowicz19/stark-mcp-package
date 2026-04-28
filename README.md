@@ -254,7 +254,7 @@ Install just the orchestrator for access to all capabilities:
 
 ```bash
 # Clone the repository
-git clone https://github.com/walkowicz19/stark-mcp-package.git
+git clone https://github.com/walkowicz19/stark-mcp-servers.git
 cd stark-mcp-package/mcp-servers/orchestrator
 
 # Install dependencies
