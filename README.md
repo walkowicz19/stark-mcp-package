@@ -153,7 +153,7 @@ Stark is a suite of **production-ready MCP servers** that transform AI assistant
 
 ## 🚀 Enterprise-Scale Capabilities
 
-Stark MCP provides comprehensive tools for handling enterprise-scale systems:
+Stark provides comprehensive tools for handling enterprise-scale systems:
 
 ### 📊 Large-Scale Code Intelligence (12 Tools)
 
@@ -254,7 +254,7 @@ Install just the orchestrator for access to all capabilities:
 
 ```bash
 # Clone the repository
-git clone https://github.com/walkowicz19/stark-mcp-package.git
+git clone https://github.com/walkowicz19/stark-mcp-servers.git
 cd stark-mcp-package/mcp-servers/orchestrator
 
 # Install dependencies
@@ -302,7 +302,7 @@ Add to your `claude_desktop_config.json`:
     "stark-orchestrator": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/orchestrator/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/orchestrator/build/index.js"
       ]
     }
   }
@@ -316,13 +316,13 @@ Add to your `claude_desktop_config.json`:
     "stark-security": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/security-guardrails/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/security-guardrails/build/index.js"
       ]
     },
     "stark-codegen": {
       "command": "node",
       "args": [
-        "/absolute/path/to/stark-mcp-package/mcp-servers/code-generation/build/index.js"
+        "/absolute/path/to/stark-mcp-servers/mcp-servers/code-generation/build/index.js"
       ]
     }
   }
