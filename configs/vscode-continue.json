@@ -1,0 +1,119 @@
+{
+  "models": [
+    {
+      "title": "Claude 3.5 Sonnet",
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "apiKey": "your-anthropic-api-key-here"
+    }
+  ],
+  "mcpServers": {
+    "stark-orchestrator": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/orchestrator/build/index.js"
+      ],
+      "env": {
+        "SECURITY_API_URL": "http://localhost:8001",
+        "CODEGEN_API_URL": "http://localhost:8002",
+        "MEMORY_API_URL": "http://localhost:8003",
+        "INTELLIGENCE_API_URL": "http://localhost:8004",
+        "TOKEN_API_URL": "http://localhost:8005",
+        "SDLC_API_URL": "http://localhost:8006",
+        "LEGACY_API_URL": "http://localhost:8007",
+        "SCHEMA_API_URL": "http://localhost:8008",
+        "PERFORMANCE_API_URL": "http://localhost:8009"
+      }
+    },
+    "stark-intelligence": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/intelligence-amplification/build/index.js"
+      ],
+      "env": {
+        "INTELLIGENCE_API_URL": "http://localhost:8004"
+      }
+    },
+    "stark-schema": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/schema-intelligence/build/index.js"
+      ],
+      "env": {
+        "SCHEMA_API_URL": "http://localhost:8008"
+      }
+    },
+    "stark-security": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/security-guardrails/build/index.js"
+      ],
+      "env": {
+        "SECURITY_API_URL": "http://localhost:8001"
+      }
+    },
+    "stark-codegen": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/code-generation/build/index.js"
+      ],
+      "env": {
+        "CODEGEN_API_URL": "http://localhost:8002"
+      }
+    },
+    "stark-memory": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/memory-management/build/index.js"
+      ],
+      "env": {
+        "MEMORY_API_URL": "http://localhost:8003"
+      }
+    },
+    "stark-tokens": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/token-optimization/build/index.js"
+      ],
+      "env": {
+        "TOKEN_API_URL": "http://localhost:8005"
+      }
+    },
+    "stark-sdlc": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/sdlc-integration/build/index.js"
+      ],
+      "env": {
+        "SDLC_API_URL": "http://localhost:8006"
+      }
+    },
+    "stark-legacy": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/legacy-support/build/index.js"
+      ],
+      "env": {
+        "LEGACY_API_URL": "http://localhost:8007"
+      }
+    },
+    "stark-performance": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/stark-mcp/mcp-servers/performance-optimizer/build/index.js"
+      ],
+      "env": {
+        "PERFORMANCE_API_URL": "http://localhost:8009"
+      }
+    }
+  },
+  "tabAutocompleteModel": {
+    "title": "Starcoder",
+    "provider": "ollama",
+    "model": "starcoder2:3b"
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text"
+  }
+}

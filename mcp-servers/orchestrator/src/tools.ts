@@ -136,6 +136,7 @@ export const tools: ToolDefinition[] = [
           description: 'Optimization goals',
           items: {
             type: 'string',
+            description: 'Individual optimization goal',
           },
         },
       },
@@ -188,6 +189,7 @@ export const tools: ToolDefinition[] = [
           description: 'Refactoring goals',
           items: {
             type: 'string',
+            description: 'Individual refactoring goal',
           },
         },
         preserveTests: {
@@ -357,6 +359,7 @@ export const tools: ToolDefinition[] = [
           type: 'array',
           items: {
             type: 'string',
+            description: 'File or directory path to analyze',
           },
           description: 'Specific paths to analyze (for targeted analysis)',
         },
@@ -376,25 +379,30 @@ export const tools: ToolDefinition[] = [
           properties: {
             type: {
               type: 'string',
+              description: 'Database type',
               enum: ['postgresql', 'mysql', 'oracle', 'mongodb', 'cassandra', 'dynamodb', 'neo4j'],
             },
             host: {
               type: 'string',
+              description: 'Database host address',
             },
             port: {
-              type: 'integer',
+              type: 'number',
+              description: 'Database port number',
             },
             database: {
               type: 'string',
+              description: 'Database name',
             },
             username: {
               type: 'string',
+              description: 'Database username',
             },
             password: {
               type: 'string',
+              description: 'Database password',
             },
           },
-          required: ['type', 'host', 'database'],
         },
         schema_id: {
           type: 'string',
@@ -521,6 +529,7 @@ export const tools: ToolDefinition[] = [
           type: 'array',
           items: {
             type: 'string',
+            description: 'Assessment goal type',
             enum: ['modernization', 'optimization', 'security', 'scalability', 'maintainability'],
           },
           description: 'Assessment goals',
@@ -601,6 +610,7 @@ export const tools: ToolDefinition[] = [
           description: 'Filter by tags',
           items: {
             type: 'string',
+            description: 'Tag name',
           },
         },
       },
@@ -994,8 +1004,8 @@ export const toolHandlers = {
 
     if (args.includeStepDetails) {
       response.stepResults = Array.from(state.stepResults.entries()).map(([id, result]) => ({
-        stepId: id,
         ...result,
+        stepId: id,
       }));
     }
 

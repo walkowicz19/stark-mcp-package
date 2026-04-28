@@ -225,7 +225,22 @@ Coordinate complex multi-service workflows:
 
 - **Node.js** 20.0 or higher
 - **npm** or **yarn**
-- **Claude Desktop** or another MCP-compatible client
+- **MCP-compatible client**: Claude Desktop, VSCode (Continue), Cursor, Windsurf, Zed, IBM Bob, Antigravity, or Kiro
+
+### Multi-IDE Support
+
+Stark MCP servers work with multiple IDEs and AI tools. See the **[IDE Configuration Guide](configs/IDE_CONFIGURATIONS.md)** for detailed setup instructions for:
+
+- **Claude Desktop** - Native MCP integration
+- **VSCode** (Continue extension) - Full tool access
+- **Cursor IDE** - Native MCP support
+- **Windsurf IDE** - Complete integration
+- **Zed Editor** - Built-in MCP support
+- **IBM Bob** - IBM AI assistant
+- **Antigravity** - Antigravity AI tool
+- **Kiro** - Kiro AI assistant
+
+**Quick Start:** Copy configuration from [`configs/`](configs/) directory for your IDE.
 
 ### Installation
 
@@ -310,7 +325,11 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-See [`mcp-servers/INSTALLATION.md`](mcp-servers/INSTALLATION.md) for detailed configuration instructions.
+**For Other IDEs:**
+
+See the **[IDE Configuration Guide](configs/IDE_CONFIGURATIONS.md)** for setup instructions for VSCode, Cursor, Windsurf, Zed, IBM Bob, Antigravity, and Kiro. Ready-to-use configuration files are available in the [`configs/`](configs/) directory.
+
+See [`mcp-servers/INSTALLATION.md`](mcp-servers/INSTALLATION.md) for detailed installation instructions.
 
 ### Verify Installation
 
@@ -509,6 +528,7 @@ npm run type-check
 
 ## 📚 Documentation
 
+- **[IDE Configuration Guide](configs/IDE_CONFIGURATIONS.md)** - Multi-IDE setup and configuration
 - **[Installation Guide](mcp-servers/INSTALLATION.md)** - Detailed installation instructions
 - **[Usage Guide](mcp-servers/USAGE_GUIDE.md)** - How to use the MCP servers
 - **[Troubleshooting](mcp-servers/TROUBLESHOOTING.md)** - Common issues and solutions
