@@ -18,6 +18,7 @@ import { logger } from './utils/logger.js';
 import { ErrorHandler } from './utils/error-handler.js';
 import { getSecurityMiddleware } from './security/middleware.js';
 import { getAutoRouter } from './routing/auto-router.js';
+import { createProactiveMonitor } from './proactive/monitor.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -78,6 +79,13 @@ async function main() {
   // Initialize auto-router
   const autoRouter = getAutoRouter(securityConfig.autoRouting);
 
+  // Initialize proactive monitor
+  const proactiveMonitor = createProactiveMonitor();
+  logger.info('Proactive monitor initialized', {
+    enabled: proactiveMonitor.getConfig().enabled,
+    confidenceThreshold: proactiveMonitor.getConfig().confidenceThreshold,
+  });
+
   const server = new Server(
     {
       name: 'sytra-orchestrator',
@@ -108,6 +116,36 @@ async function main() {
     const { name, arguments: args } = request.params;
 
     logger.info('Tool execution requested', { tool: name });
+
+    // Analyze message for proactive response (if it's a user message)
+    if (args && typeof args === 'object' && 'message' in args && typeof args.message === 'string') {
+      const proactiveResponse = await proactiveMonitor.analyzeMessage(args.message as string, 'user');
+      
+      if (proactiveResponse.triggered && proactiveResponse.message) {
+        logger.proactive('Proactive response triggered', {
+          patternType: proactiveResponse.patternMatch?.patternType,
+          confidence: proactiveResponse.patternMatch?.confidence,
+          responseId: proactiveResponse.responseId,
+        });
+
+        // Return proactive response as a notification
+        // The user can then decide whether to accept the assistance
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                proactiveResponse: true,
+                message: proactiveResponse.message,
+                responseId: proactiveResponse.responseId,
+                patternType: proactiveResponse.patternMatch?.patternType,
+                confidence: proactiveResponse.patternMatch?.confidence,
+              }, null, 2),
+            },
+          ],
+        };
+      }
+    }
 
     try {
       // Security check: Validate tool execution
@@ -158,6 +196,12 @@ async function main() {
       const result = await handler(args || {});
 
       logger.info('Tool execution completed', { tool: name });
+
+      // Track assistant responses in proactive monitor
+      if (result && typeof result === 'object') {
+        const resultStr = JSON.stringify(result);
+        await proactiveMonitor.analyzeMessage(resultStr, 'assistant');
+      }
 
       // Apply credential redaction to the result if needed
       let resultText = JSON.stringify(result, null, 2);

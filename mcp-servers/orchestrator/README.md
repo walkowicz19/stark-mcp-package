@@ -15,6 +15,7 @@ The Orchestrator acts as the central coordination layer for the Sytra platform, 
 - **Legacy Modernization**: Advanced COBOL, mainframe, and legacy system assessment
 - **Error Handling**: Robust retry mechanisms and error recovery
 - **Parallel Execution**: Optimizes workflow execution with parallel step processing
+- **Proactive AI Response**: Automatically detects when assistance is needed and offers help without being explicitly called
 
 ## Architecture
 
@@ -591,6 +592,391 @@ Create a JSON file in the `workflows/` directory:
   "timeout": 600000
 }
 ```
+
+## Proactive AI Response System
+
+### Overview
+
+The Proactive Response System allows SYTRA to automatically monitor conversations and offer assistance when relevant, without being explicitly invoked. This feature uses pattern matching and confidence scoring to detect scenarios where SYTRA can provide value.
+
+### Features
+
+- **Automatic Pattern Detection**: Monitors for errors, questions, security concerns, performance issues, and more
+- **Confidence Scoring**: Only responds when confidence threshold is met (default: 75%)
+- **Rate Limiting**: Prevents intrusive behavior with cooldown periods and hourly limits
+- **User Feedback Learning**: Adjusts confidence scores based on user acceptance/rejection
+- **Extensible Patterns**: Easy to add new detection patterns
+- **Comprehensive Logging**: Tracks all proactive responses for analysis
+
+### Configuration
+
+The proactive response system is configured via `proactive-config.json`:
+
+```json
+{
+  "enabled": false,
+  "confidenceThreshold": 0.75,
+  "cooldownPeriodMs": 300000,
+  "maxProactiveResponsesPerHour": 10,
+  "patterns": {
+    "errors": {
+      "enabled": true,
+      "confidence": 0.9,
+      "keywords": ["error", "exception", "failed", "crash"],
+      "response": "I noticed an error. Would you like me to investigate?"
+    }
+  }
+}
+```
+
+### Enabling Proactive Responses
+
+1. **Edit Configuration File**:
+   ```bash
+   cd mcp-servers/orchestrator
+   # Edit proactive-config.json
+   ```
+
+2. **Set `enabled` to `true`**:
+   ```json
+   {
+     "enabled": true,
+     "confidenceThreshold": 0.75
+   }
+   ```
+
+3. **Restart the Orchestrator**:
+   ```bash
+   npm run build
+   # Restart your MCP server
+   ```
+
+### Detection Patterns
+
+The system includes 8 built-in detection patterns:
+
+#### 1. **Errors** (Confidence: 0.9)
+Detects error messages, exceptions, stack traces, and crashes.
+
+**Keywords**: error, exception, failed, crash, stack trace, undefined, null reference
+
+**Example Trigger**: "TypeError: Cannot read property 'name' of undefined"
+
+#### 2. **Code Questions** (Confidence: 0.8)
+Detects questions about code or development.
+
+**Keywords**: how do i, how to, what is, why does, can you explain
+
+**Example Trigger**: "How do I implement authentication in Express?"
+
+#### 3. **Code Review** (Confidence: 0.7)
+Detects requests for code review or feedback.
+
+**Keywords**: review this, check this code, is this correct, feedback on
+
+**Example Trigger**: "Does this look good? Can you review it?"
+
+#### 4. **Security** (Confidence: 0.95)
+Detects security-related concerns (highest priority).
+
+**Keywords**: security, vulnerability, injection, xss, csrf, password, credential
+
+**Example Trigger**: "Is this SQL query vulnerable to injection?"
+
+#### 5. **Performance** (Confidence: 0.75)
+Detects performance issues and optimization needs.
+
+**Keywords**: slow, performance, optimize, bottleneck, memory leak, latency
+
+**Example Trigger**: "This query is taking too long to execute"
+
+#### 6. **Architecture** (Confidence: 0.7)
+Detects architectural and design pattern discussions.
+
+**Keywords**: architecture, design pattern, refactor, scalable, maintainable
+
+**Example Trigger**: "What's the best architecture for a microservices system?"
+
+#### 7. **Testing** (Confidence: 0.75)
+Detects testing-related discussions.
+
+**Keywords**: test, unit test, integration test, coverage, mock
+
+**Example Trigger**: "I need to write tests for this function"
+
+#### 8. **Documentation** (Confidence: 0.7)
+Detects documentation needs.
+
+**Keywords**: document, documentation, readme, comment, explain
+
+**Example Trigger**: "This code needs better documentation"
+
+### Configuration Options
+
+#### Global Settings
+
+- **`enabled`** (boolean): Master switch for proactive responses
+- **`confidenceThreshold`** (number, 0-1): Minimum confidence to trigger response
+- **`cooldownPeriodMs`** (number): Milliseconds between proactive responses (default: 300000 = 5 minutes)
+- **`maxProactiveResponsesPerHour`** (number): Maximum responses per hour (default: 10)
+
+#### Pattern Settings
+
+Each pattern can be configured with:
+
+- **`enabled`** (boolean): Enable/disable this specific pattern
+- **`confidence`** (number, 0-1): Base confidence score for this pattern
+- **`keywords`** (array): Keywords to match (case-insensitive)
+- **`response`** (string): Message to display when triggered
+
+#### Context Window
+
+- **`maxMessages`** (number): Maximum conversation messages to track (default: 5)
+- **`maxTokensPerMessage`** (number): Maximum tokens per message (default: 1000)
+
+#### Logging
+
+- **`logProactiveResponses`** (boolean): Log when proactive responses trigger
+- **`logPatternMatches`** (boolean): Log pattern matches
+- **`logConfidenceScores`** (boolean): Log confidence scores
+
+#### User Feedback
+
+- **`enabled`** (boolean): Enable feedback tracking
+- **`trackAcceptance`** (boolean): Track user acceptance/rejection
+- **`adjustConfidenceBasedOnFeedback`** (boolean): Auto-adjust confidence scores
+
+### Example Scenarios
+
+#### Scenario 1: Error Detection
+
+**User Message**: "I'm getting this error: TypeError: Cannot read property 'map' of undefined"
+
+**SYTRA Response**:
+```
+🤖 SYTRA Proactive Assistant
+
+I noticed an error in your output. I can help analyze and fix this issue. Would you like me to investigate?
+
+📋 Error Analysis:
+- Type: runtime
+- Severity: high
+
+Matched Keywords: error, undefined, cannot read property
+Confidence: 92.5%
+
+Reply with "yes" or "proceed" to accept my assistance, or continue with your task.
+```
+
+#### Scenario 2: Security Concern
+
+**User Message**: "I'm storing passwords like this: password = request.body.password"
+
+**SYTRA Response**:
+```
+🤖 SYTRA Proactive Assistant
+
+I detected a potential security concern. I can perform a security audit and provide recommendations. Would you like me to analyze this?
+
+🔒 Security Concern:
+- Type: password_storage
+- This requires immediate attention
+
+Matched Keywords: password
+Confidence: 95.0%
+
+Reply with "yes" or "proceed" to accept my assistance, or continue with your task.
+```
+
+#### Scenario 3: Performance Issue
+
+**User Message**: "This database query is really slow, taking 5+ seconds"
+
+**SYTRA Response**:
+```
+🤖 SYTRA Proactive Assistant
+
+I noticed a performance-related discussion. I can analyze and suggest optimizations. Would you like me to help?
+
+⚡ Performance Issue:
+- Type: slow_query
+
+Matched Keywords: slow, query
+Confidence: 82.3%
+
+Reply with "yes" or "proceed" to accept my assistance, or continue with your task.
+```
+
+### Customizing Patterns
+
+You can add custom patterns to `proactive-config.json`:
+
+```json
+{
+  "patterns": {
+    "myCustomPattern": {
+      "enabled": true,
+      "confidence": 0.8,
+      "keywords": [
+        "custom keyword 1",
+        "custom keyword 2"
+      ],
+      "response": "I can help with this custom scenario. Would you like assistance?"
+    }
+  }
+}
+```
+
+### Disabling Specific Patterns
+
+To disable a pattern without removing it:
+
+```json
+{
+  "patterns": {
+    "errors": {
+      "enabled": false
+    }
+  }
+}
+```
+
+### Adjusting Sensitivity
+
+To make SYTRA more or less proactive:
+
+**More Proactive** (lower threshold):
+```json
+{
+  "confidenceThreshold": 0.6,
+  "cooldownPeriodMs": 180000,
+  "maxProactiveResponsesPerHour": 15
+}
+```
+
+**Less Proactive** (higher threshold):
+```json
+{
+  "confidenceThreshold": 0.85,
+  "cooldownPeriodMs": 600000,
+  "maxProactiveResponsesPerHour": 5
+}
+```
+
+### Monitoring and Analytics
+
+The system tracks:
+
+- Total messages analyzed
+- Proactive responses triggered
+- Pattern matches by type
+- Average confidence scores
+- User acceptance rates
+
+Access statistics through the monitor's `getStats()` method or check logs.
+
+### Best Practices
+
+1. **Start Disabled**: Test patterns before enabling in production
+2. **Adjust Thresholds**: Fine-tune confidence thresholds based on feedback
+3. **Monitor Logs**: Review proactive response logs regularly
+4. **User Feedback**: Encourage users to provide feedback on helpfulness
+5. **Pattern Refinement**: Add/remove keywords based on false positives/negatives
+6. **Rate Limiting**: Keep cooldown periods reasonable to avoid annoyance
+7. **Context Awareness**: Ensure patterns are specific enough to avoid false triggers
+
+### Troubleshooting Proactive Responses
+
+#### Too Many False Positives
+
+- Increase `confidenceThreshold`
+- Refine pattern keywords to be more specific
+- Increase `cooldownPeriodMs`
+- Reduce `maxProactiveResponsesPerHour`
+
+#### Missing Relevant Triggers
+
+- Decrease `confidenceThreshold`
+- Add more keywords to patterns
+- Check if pattern is enabled
+- Review logs for near-misses
+
+#### Performance Impact
+
+- Reduce `maxMessages` in context window
+- Disable logging if not needed
+- Disable unused patterns
+
+### Security Considerations
+
+- Proactive responses respect all security middleware
+- No sensitive data is logged in proactive responses
+- Pattern matching is performed on sanitized content
+- User feedback is stored locally and not transmitted
+## Parallel Task Execution
+
+### Overview
+
+SYTRA includes an intelligent parallel execution system that automatically classifies tasks by complexity and executes them accordingly:
+
+- **Simple/Medium Tasks**: Run in parallel for maximum efficiency
+- **Complex Tasks**: Run individually for focused attention and resource allocation
+
+### Task Complexity Classification
+
+Tasks are automatically classified into three categories:
+
+#### Simple Tasks (Score: 0-29)
+- Syntax checking, code formatting, linting
+- File reading, basic validation
+- **Execution**: Parallel (up to 5 tasks simultaneously)
+
+#### Medium Tasks (Score: 30-59)
+- Code review, test generation, documentation
+- Code generation, bug fixing
+- **Execution**: Parallel (up to 5 tasks simultaneously)
+
+#### Complex Tasks (Score: 60+)
+- Full system assessment, legacy modernization
+- Database migration, security audit
+- Architecture design, large codebase analysis
+- **Execution**: Sequential (one at a time)
+
+### Configuration
+
+Configure parallel execution in `proactive-config.json`:
+
+```json
+{
+  "parallelExecution": {
+    "enabled": true,
+    "maxParallelTasks": 5,
+    "maxConcurrentBatches": 2,
+    "timeoutMs": 300000,
+    "retryFailedTasks": true,
+    "maxRetries": 2,
+    "complexityThresholds": {
+      "simple": 30,
+      "medium": 60
+    }
+  }
+}
+```
+
+### Performance Benefits
+
+- **Up to 5x faster** for multiple simple tasks
+- **Optimized resource usage** for complex operations
+- **Automatic load balancing** across task types
+- **Intelligent timeout management** based on complexity
+
+### Best Practices
+
+1. **Batch Similar Tasks**: Group similar complexity tasks together
+2. **Monitor Performance**: Review execution statistics regularly
+3. **Adjust Thresholds**: Fine-tune complexity thresholds based on your workload
+4. **Resource Planning**: Consider system resources when setting `maxParallelTasks`
+
 
 ## Troubleshooting
 

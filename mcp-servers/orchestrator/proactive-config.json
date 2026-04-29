@@ -1,0 +1,169 @@
+{
+  "enabled": false,
+  "confidenceThreshold": 0.75,
+  "cooldownPeriodMs": 300000,
+  "maxProactiveResponsesPerHour": 10,
+  "patterns": {
+    "errors": {
+      "enabled": true,
+      "confidence": 0.9,
+      "keywords": [
+        "error",
+        "exception",
+        "failed",
+        "crash",
+        "stack trace",
+        "traceback",
+        "undefined",
+        "null reference",
+        "cannot read property",
+        "syntax error",
+        "type error",
+        "reference error"
+      ],
+      "response": "I noticed an error in your output. I can help analyze and fix this issue. Would you like me to investigate?"
+    },
+    "codeQuestions": {
+      "enabled": true,
+      "confidence": 0.8,
+      "keywords": [
+        "how do i",
+        "how to",
+        "what is",
+        "why does",
+        "can you explain",
+        "help me understand",
+        "what's the best way",
+        "how should i",
+        "is there a way"
+      ],
+      "response": "I can help answer your question about the codebase. Would you like me to provide detailed guidance?"
+    },
+    "codeReview": {
+      "enabled": true,
+      "confidence": 0.7,
+      "keywords": [
+        "review this",
+        "check this code",
+        "is this correct",
+        "does this look good",
+        "feedback on",
+        "thoughts on",
+        "opinion on",
+        "improve this"
+      ],
+      "response": "I can perform a comprehensive code review including security, performance, and best practices analysis. Shall I proceed?"
+    },
+    "security": {
+      "enabled": true,
+      "confidence": 0.95,
+      "keywords": [
+        "security",
+        "vulnerability",
+        "exploit",
+        "injection",
+        "xss",
+        "csrf",
+        "authentication",
+        "authorization",
+        "password",
+        "credential",
+        "api key",
+        "secret",
+        "token leak"
+      ],
+      "response": "I detected a potential security concern. I can perform a security audit and provide recommendations. Would you like me to analyze this?"
+    },
+    "performance": {
+      "enabled": true,
+      "confidence": 0.75,
+      "keywords": [
+        "slow",
+        "performance",
+        "optimize",
+        "bottleneck",
+        "memory leak",
+        "high cpu",
+        "latency",
+        "timeout",
+        "inefficient",
+        "taking too long"
+      ],
+      "response": "I noticed a performance-related discussion. I can analyze and suggest optimizations. Would you like me to help?"
+    },
+    "architecture": {
+      "enabled": true,
+      "confidence": 0.7,
+      "keywords": [
+        "architecture",
+        "design pattern",
+        "refactor",
+        "restructure",
+        "organize",
+        "modular",
+        "scalable",
+        "maintainable",
+        "technical debt"
+      ],
+      "response": "I can help with architectural decisions and design patterns. Would you like me to provide recommendations?"
+    },
+    "testing": {
+      "enabled": true,
+      "confidence": 0.75,
+      "keywords": [
+        "test",
+        "unit test",
+        "integration test",
+        "e2e",
+        "coverage",
+        "mock",
+        "stub",
+        "test case",
+        "assertion"
+      ],
+      "response": "I can help create comprehensive tests for your code. Would you like me to generate test cases?"
+    },
+    "documentation": {
+      "enabled": true,
+      "confidence": 0.7,
+      "keywords": [
+        "document",
+        "documentation",
+        "readme",
+        "comment",
+        "explain",
+        "describe",
+        "api docs",
+        "jsdoc",
+        "docstring"
+      ],
+      "response": "I can help improve documentation for better code understanding. Would you like me to assist?"
+    }
+  },
+  "contextWindow": {
+    "maxMessages": 5,
+    "maxTokensPerMessage": 1000
+  },
+  "logging": {
+    "logProactiveResponses": true,
+    "logPatternMatches": true,
+    "logConfidenceScores": true
+  },
+  "userFeedback": {
+    "enabled": true,
+    "trackAcceptance": true,
+    "adjustConfidenceBasedOnFeedback": true
+  },
+  "parallelExecution": {
+    "enabled": true,
+    "maxParallelTasks": 5,
+    "maxConcurrentBatches": 2,
+    "timeoutMs": 300000,
+    "retryFailedTasks": true,
+    "maxRetries": 2,
+    "complexityThresholds": {
+      "simple": 30,
+      "medium": 60
+    }
+  }
+}

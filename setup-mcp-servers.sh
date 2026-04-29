@@ -143,6 +143,29 @@ for server in "${servers[@]}"; do
     fi
 done
 
+# Build Dashboard API
+print_color "$MAGENTA" "\n=== Setting Up Dashboard API ==="
+((total_servers++))
+
+if [ -d "dashboard-api/node_modules" ]; then
+    print_color "$GREEN" "Dashboard API dependencies already installed"
+    results["Dashboard API"]=1
+    ((success_count++))
+else
+    print_color "$CYAN" "Installing Dashboard API dependencies..."
+    cd dashboard-api
+    echo "  Installing npm packages..."
+    if npm install --silent > /dev/null 2>&1; then
+        print_color "$GREEN" "  SUCCESS: Dashboard API ready"
+        results["Dashboard API"]=1
+        ((success_count++))
+    else
+        print_color "$RED" "  FAILED: Dashboard API - npm install failed"
+        results["Dashboard API"]=0
+    fi
+    cd ..
+fi
+
 # Summary
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
@@ -176,36 +199,84 @@ if [ $success_count -eq $total_servers ]; then
     print_color "$GREEN" "\nAll servers built successfully!"
     
     # Check if Docker is available for backend services
-    print_color "$MAGENTA" "\n=== Backend Services Setup ==="
+    print_color "$MAGENTA" "\n=== Backend Services & Dashboard Setup ==="
     if command -v docker &> /dev/null; then
         DOCKER_VERSION=$(docker --version)
         print_color "$GREEN" "Docker found: $DOCKER_VERSION"
         
         echo ""
-        read -p "Would you like to start the backend services now? (Y/N): " response
+        read -p "Would you like to start the backend services and dashboard now? (Y/N): " response
         
         if [[ "$response" =~ ^[Yy]$ ]]; then
             print_color "$CYAN" "\nStarting backend services..."
             cd services
-            bash start-services.sh
+            if docker-compose up -d; then
+                print_color "$GREEN" "Backend services started successfully!"
+            else
+                print_color "$RED" "Failed to start Docker services"
+            fi
             cd ..
+            
+            # Start Dashboard API
+            print_color "$CYAN" "\nStarting Dashboard API..."
+            cd dashboard-api
+            node server.js > /dev/null 2>&1 &
+            DASHBOARD_PID=$!
+            cd ..
+            
+            sleep 2
+            
+            # Test if dashboard is responding
+            DASHBOARD_READY=false
+            for i in {1..15}; do
+                if curl -s -f http://localhost:3000/api/health > /dev/null 2>&1; then
+                    DASHBOARD_READY=true
+                    break
+                fi
+                sleep 0.5
+            done
+            
+            if [ "$DASHBOARD_READY" = true ]; then
+                print_color "$GREEN" "Dashboard API started successfully!"
+                print_color "$MAGENTA" "\n=== Service URLs ==="
+                print_color "$CYAN" "\nBackend Services:"
+                print_color "$WHITE" "  Security:      http://localhost:8001/docs"
+                print_color "$WHITE" "  Code Gen:      http://localhost:8002/docs"
+                print_color "$WHITE" "  Memory:        http://localhost:8003/docs"
+                print_color "$WHITE" "  Intelligence:  http://localhost:8004/docs"
+                print_color "$WHITE" "  Tokens:        http://localhost:8005/docs"
+                print_color "$WHITE" "  SDLC:          http://localhost:8006/docs"
+                print_color "$WHITE" "  Legacy:        http://localhost:8007/docs"
+                print_color "$WHITE" "  Schema:        http://localhost:8008/docs"
+                print_color "$WHITE" "  Performance:   http://localhost:8009/docs"
+                print_color "$CYAN" "\nManagement Dashboard:"
+                print_color "$GREEN" "  Dashboard:     http://localhost:3000"
+                print_color "$YELLOW" "\nTo stop services:"
+                print_color "$GRAY" "  Dashboard:     kill $DASHBOARD_PID"
+                print_color "$GRAY" "  Backend:       cd services && docker-compose down"
+            else
+                print_color "$YELLOW" "WARNING: Dashboard may not have started correctly"
+                print_color "$GRAY" "Check manually at: http://localhost:3000"
+            fi
         else
-            print_color "$YELLOW" "\nTo start backend services later, run:"
-            print_color "$GRAY" "  cd services && bash start-services.sh"
+            print_color "$YELLOW" "\nTo start services later:"
+            print_color "$GRAY" "  Backend:   cd services && docker-compose up -d"
+            print_color "$GRAY" "  Dashboard: cd dashboard-api && node server.js"
         fi
     else
         print_color "$YELLOW" "Docker not found. Backend services require Docker."
         print_color "$GRAY" "Install Docker from: https://www.docker.com/get-started"
-        print_color "$YELLOW" "\nOr start services manually with Python:"
-        print_color "$GRAY" "  cd services && python3 -m venv venv && source venv/bin/activate && pip install -r shared/requirements.txt"
+        print_color "$CYAN" "\nYou can still start the Dashboard:"
+        print_color "$GRAY" "  cd dashboard-api && node server.js"
     fi
     
     print_color "$CYAN" "\nNext steps:"
     print_color "$GRAY" "  1. Configure your IDE (see configs/ directory)"
     print_color "$GRAY" "  2. Update paths in config to match your installation"
     print_color "$GRAY" "  3. Ensure backend services are running (ports 8001-8009)"
-    print_color "$GRAY" "  4. Restart your IDE to load the MCP servers"
-    print_color "$GRAY" "  5. Test with: 'sytra analyze this code...'"
+    print_color "$GRAY" "  4. Access the dashboard at http://localhost:3000"
+    print_color "$GRAY" "  5. Restart your IDE to load the MCP servers"
+    print_color "$GRAY" "  6. Test with: 'sytra analyze this code...'"
     exit 0
 else
     print_color "$YELLOW" "\nSome servers failed to build. Check the errors above."

@@ -84,6 +84,50 @@ class Logger {
   child(additionalContext: Record<string, any>): Logger {
     return new Logger({ ...this.context, ...additionalContext });
   }
+
+  /**
+   * Log proactive response events
+   */
+  proactive(message: string, context?: Record<string, any>): void {
+    const proactiveContext = {
+      ...context,
+      eventType: 'proactive_response',
+    };
+    this.log(LogLevel.INFO, `[PROACTIVE] ${message}`, proactiveContext);
+  }
+
+  /**
+   * Log pattern match events
+   */
+  patternMatch(message: string, context?: Record<string, any>): void {
+    const patternContext = {
+      ...context,
+      eventType: 'pattern_match',
+    };
+    this.log(LogLevel.DEBUG, `[PATTERN] ${message}`, patternContext);
+  }
+
+  /**
+   * Log confidence score events
+   */
+  confidence(message: string, context?: Record<string, any>): void {
+    const confidenceContext = {
+      ...context,
+      eventType: 'confidence_score',
+    };
+    this.log(LogLevel.DEBUG, `[CONFIDENCE] ${message}`, confidenceContext);
+  }
+
+  /**
+   * Log user feedback events
+   */
+  feedback(message: string, context?: Record<string, any>): void {
+    const feedbackContext = {
+      ...context,
+      eventType: 'user_feedback',
+    };
+    this.log(LogLevel.INFO, `[FEEDBACK] ${message}`, feedbackContext);
+  }
 }
 
 // Create default logger instance

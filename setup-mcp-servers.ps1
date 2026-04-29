@@ -169,6 +169,39 @@ foreach ($server in $servers) {
     }
 }
 
+# Build Dashboard API
+Write-ColorOutput "`n=== Setting Up Dashboard API ===" "Magenta"
+$totalServers++
+
+if (Test-Path "dashboard-api/node_modules") {
+    Write-ColorOutput "Dashboard API dependencies already installed" "Green"
+    $results["Dashboard API"] = $true
+    $successCount++
+}
+else {
+    Write-ColorOutput "Installing Dashboard API dependencies..." "Cyan"
+    Push-Location "dashboard-api"
+    try {
+        Write-Host "  Installing npm packages..." -ForegroundColor Gray
+        npm install --silent 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-ColorOutput "  SUCCESS: Dashboard API ready" "Green"
+            $results["Dashboard API"] = $true
+            $successCount++
+        }
+        else {
+            throw "npm install failed"
+        }
+    }
+    catch {
+        Write-ColorOutput "  FAILED: Dashboard API - $_" "Red"
+        $results["Dashboard API"] = $false
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 # Summary
 $endTime = Get-Date
 $duration = $endTime - $startTime
@@ -209,37 +242,94 @@ if ($successCount -eq $totalServers) {
     Write-ColorOutput "`nAll servers built successfully!" "Green"
     
     # Check if Docker is available for backend services
-    Write-ColorOutput "`n=== Backend Services Setup ===" "Magenta"
+    Write-ColorOutput "`n=== Backend Services & Dashboard Setup ===" "Magenta"
     try {
         $dockerVersion = docker --version 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-ColorOutput "Docker found: $dockerVersion" "Green"
-            Write-ColorOutput "`nWould you like to start the backend services now? (Y/N)" "Cyan"
+            Write-ColorOutput "`nWould you like to start the backend services and dashboard now? (Y/N)" "Cyan"
             $response = Read-Host
             
             if ($response -eq 'Y' -or $response -eq 'y') {
                 Write-ColorOutput "`nStarting backend services..." "Cyan"
                 Push-Location services
                 try {
-                    & .\start-services.ps1
-                    Pop-Location
+                    docker-compose up -d
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-ColorOutput "Backend services started successfully!" "Green"
+                    }
+                    else {
+                        throw "Docker Compose failed"
+                    }
                 }
                 catch {
+                    Write-ColorOutput "Failed to start Docker services" "Red"
+                }
+                finally {
                     Pop-Location
-                    Write-ColorOutput "Failed to start services. You can start them manually later with:" "Yellow"
-                    Write-ColorOutput "  cd services && .\start-services.ps1" "Gray"
+                }
+                
+                # Start Dashboard API
+                Write-ColorOutput "`nStarting Dashboard API..." "Cyan"
+                try {
+                    $dashboardProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -WorkingDirectory "dashboard-api" -WindowStyle Hidden -PassThru
+                    Start-Sleep -Seconds 2
+                    
+                    # Test if dashboard is responding
+                    $maxAttempts = 15
+                    $dashboardReady = $false
+                    for ($i = 1; $i -le $maxAttempts; $i++) {
+                        try {
+                            $response = Invoke-WebRequest -Uri "http://localhost:3000/api/health" -Method GET -TimeoutSec 1 -UseBasicParsing -ErrorAction SilentlyContinue
+                            if ($response.StatusCode -eq 200) {
+                                $dashboardReady = $true
+                                break
+                            }
+                        }
+                        catch {
+                            Start-Sleep -Milliseconds 500
+                        }
+                    }
+                    
+                    if ($dashboardReady) {
+                        Write-ColorOutput "Dashboard API started successfully!" "Green"
+                        Write-ColorOutput "`n=== Service URLs ===" "Magenta"
+                        Write-ColorOutput "`nBackend Services:" "Cyan"
+                        Write-ColorOutput "  Security:      http://localhost:8001/docs" "White"
+                        Write-ColorOutput "  Code Gen:      http://localhost:8002/docs" "White"
+                        Write-ColorOutput "  Memory:        http://localhost:8003/docs" "White"
+                        Write-ColorOutput "  Intelligence:  http://localhost:8004/docs" "White"
+                        Write-ColorOutput "  Tokens:        http://localhost:8005/docs" "White"
+                        Write-ColorOutput "  SDLC:          http://localhost:8006/docs" "White"
+                        Write-ColorOutput "  Legacy:        http://localhost:8007/docs" "White"
+                        Write-ColorOutput "  Schema:        http://localhost:8008/docs" "White"
+                        Write-ColorOutput "  Performance:   http://localhost:8009/docs" "White"
+                        Write-ColorOutput "`nManagement Dashboard:" "Cyan"
+                        Write-ColorOutput "  Dashboard:     http://localhost:3000" "Green"
+                        Write-ColorOutput "`nTo stop services:" "Yellow"
+                        Write-ColorOutput "  Dashboard:     Stop the node process (PID: $($dashboardProcess.Id))" "Gray"
+                        Write-ColorOutput "  Backend:       cd services && docker-compose down" "Gray"
+                    }
+                    else {
+                        Write-ColorOutput "WARNING: Dashboard may not have started correctly" "Yellow"
+                        Write-ColorOutput "Check manually at: http://localhost:3000" "Gray"
+                    }
+                }
+                catch {
+                    Write-ColorOutput "Failed to start Dashboard API: $_" "Red"
                 }
             }
             else {
-                Write-ColorOutput "`nTo start backend services later, run:" "Yellow"
-                Write-ColorOutput "  cd services && .\start-services.ps1" "Gray"
+                Write-ColorOutput "`nTo start services later:" "Yellow"
+                Write-ColorOutput "  Backend:   cd services && docker-compose up -d" "Gray"
+                Write-ColorOutput "  Dashboard: cd dashboard-api && node server.js" "Gray"
             }
         }
         else {
             Write-ColorOutput "Docker not found. Backend services require Docker." "Yellow"
             Write-ColorOutput "Install Docker Desktop from: https://www.docker.com/products/docker-desktop" "Gray"
-            Write-ColorOutput "`nOr start services manually with Python:" "Yellow"
-            Write-ColorOutput "  cd services && python -m venv venv && venv\Scripts\activate && pip install -r shared/requirements.txt" "Gray"
+            Write-ColorOutput "`nYou can still start the Dashboard:" "Cyan"
+            Write-ColorOutput "  cd dashboard-api && node server.js" "Gray"
         }
     }
     catch {
@@ -250,8 +340,9 @@ if ($successCount -eq $totalServers) {
     Write-ColorOutput "  1. Configure your IDE (see configs/ directory)" "Gray"
     Write-ColorOutput "  2. Update paths in config to match your installation" "Gray"
     Write-ColorOutput "  3. Ensure backend services are running (ports 8001-8009)" "Gray"
-    Write-ColorOutput "  4. Restart your IDE to load the MCP servers" "Gray"
-    Write-ColorOutput "  5. Test with: 'sytra analyze this code...'" "Gray"
+    Write-ColorOutput "  4. Access the dashboard at http://localhost:3000" "Gray"
+    Write-ColorOutput "  5. Restart your IDE to load the MCP servers" "Gray"
+    Write-ColorOutput "  6. Test with: 'sytra analyze this code...'" "Gray"
     exit 0
 }
 else {
