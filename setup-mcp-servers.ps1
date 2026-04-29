@@ -116,7 +116,7 @@ function Build-Server {
 $startTime = Get-Date
 
 Write-ColorOutput "`n========================================" "Cyan"
-Write-ColorOutput "  STARK MCP SERVERS SETUP SCRIPT" "Cyan"
+Write-ColorOutput "  SYTRA MCP SERVERS SETUP SCRIPT" "Cyan"
 Write-ColorOutput "========================================`n" "Cyan"
 
 Test-Prerequisites
