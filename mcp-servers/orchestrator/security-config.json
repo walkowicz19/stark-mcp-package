@@ -20,7 +20,9 @@
     "*.pwd",
     ".aws/credentials",
     ".ssh/id_*",
-    "*.token"
+    "*.token",
+    "**/configs/*.json",
+    "**/*config*.json"
   ],
   "dangerousOperations": [
     "delete",
@@ -62,5 +64,41 @@
     "maxAttempts": 5,
     "windowMs": 900000,
     "blockDurationMs": 3600000
+  },
+  "credentialRedaction": {
+    "enabled": true,
+    "patterns": [
+      "password",
+      "token",
+      "api_key",
+      "apiKey",
+      "secret",
+      "SECRET",
+      "PASSWORD",
+      "TOKEN",
+      "SYTRA_ADMIN_PASSWORD",
+      "AWS_SECRET_ACCESS_KEY",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SESSION_TOKEN",
+      "private_key",
+      "privateKey",
+      "bearer",
+      "jwt",
+      "connectionString",
+      "connection_string",
+      "DATABASE_URL"
+    ],
+    "filePatterns": [
+      "**/configs/*.json",
+      "**/*config*.json",
+      "**/.env*",
+      "**/credentials*",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.p12",
+      "**/*.pfx",
+      "**/.aws/credentials",
+      "**/.ssh/id_*"
+    ]
   }
 }

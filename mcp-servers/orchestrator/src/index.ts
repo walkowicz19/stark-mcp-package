@@ -159,11 +159,34 @@ async function main() {
 
       logger.info('Tool execution completed', { tool: name });
 
+      // Apply credential redaction to the result if needed
+      let resultText = JSON.stringify(result, null, 2);
+      
+      // Check if this is a file read operation or contains file content
+      if (name.includes('read') || name.includes('file') || name.includes('config')) {
+        // Try to detect file paths in the arguments
+        const filePath = (args?.path || args?.filePath || args?.file || '') as string;
+        
+        if (filePath && typeof filePath === 'string' && securityMiddleware.shouldRedactFile(filePath)) {
+          const redactionResult = securityMiddleware.redactFileContent(resultText, filePath);
+          resultText = redactionResult.content;
+          
+          if (redactionResult.redacted) {
+            logger.warn('Credentials redacted from tool response', {
+              tool: name,
+              filePath,
+              redactionCount: redactionResult.redactionCount,
+              patterns: redactionResult.patterns,
+            });
+          }
+        }
+      }
+
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(result, null, 2),
+            text: resultText,
           },
         ],
       };

@@ -87,9 +87,19 @@ export class SecurityGuardrails {
         };
       }
 
-      // Read operations on sensitive files are logged but allowed
-      this.logOperation(operation, normalizedPath, 'allowed', 'Read operation on sensitive file');
-      logger.warn('Sensitive file accessed', { operation, path: normalizedPath, toolName });
+      // Check if this is an MCP config file - these require special handling
+      if (this.isMCPConfigFile(normalizedPath)) {
+        this.logOperation(operation, normalizedPath, 'allowed', 'Read operation on MCP config file (will be redacted)');
+        logger.warn('MCP config file accessed - credentials will be redacted', {
+          operation,
+          path: normalizedPath,
+          toolName
+        });
+      } else {
+        // Read operations on other sensitive files are logged but allowed
+        this.logOperation(operation, normalizedPath, 'allowed', 'Read operation on sensitive file');
+        logger.warn('Sensitive file accessed', { operation, path: normalizedPath, toolName });
+      }
     }
 
     // Operation is allowed
@@ -136,6 +146,30 @@ export class SecurityGuardrails {
     
     const opLower = operation.toLowerCase();
     return readOnlyOps.some(readOp => opLower.includes(readOp));
+  }
+
+  /**
+   * Check if file is an MCP config file
+   */
+  private isMCPConfigFile(filePath: string): boolean {
+    const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
+    
+    // MCP config file patterns
+    const mcpConfigPatterns = [
+      /\/configs\/.*\.json$/,
+      /\/config\/.*\.json$/,
+      /mcp.*config.*\.json$/,
+      /claude.*desktop.*config.*\.json$/,
+      /antigravity\.json$/,
+      /ibm-bob\.json$/,
+      /kiro\.json$/,
+      /cursor\.json$/,
+      /windsurf\.json$/,
+      /zed\.json$/,
+      /vscode-continue\.json$/,
+    ];
+
+    return mcpConfigPatterns.some(pattern => pattern.test(normalizedPath));
   }
 
   /**

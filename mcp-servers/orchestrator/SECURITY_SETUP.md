@@ -104,6 +104,35 @@ Edit Windsurf settings:
 
 ## Security Features
 
+### Credential Redaction
+- **Automatic credential protection**: Passwords, tokens, and API keys are automatically redacted from file content
+- **MCP config file protection**: Reading MCP configuration files (e.g., `configs/antigravity.json`) automatically redacts sensitive credentials
+- **Comprehensive pattern matching**: Detects and redacts:
+  - Passwords: `"password": "..."` → `"password": "[REDACTED]"`
+  - Admin passwords: `"SYTRA_ADMIN_PASSWORD": "..."` → `"SYTRA_ADMIN_PASSWORD": "[REDACTED]"`
+  - API keys: `"api_key": "..."`, `"apiKey": "..."` → `"[REDACTED]"`
+  - Tokens: `"token": "..."`, Bearer tokens, JWT tokens → `"[REDACTED]"`
+  - AWS credentials: `AWS_SECRET_ACCESS_KEY`, `AWS_ACCESS_KEY_ID` → `"[REDACTED]"`
+  - Database connection strings: `postgres://user:password@host` → `postgres://user:[REDACTED]@host`
+  - SSH private keys: Content between `-----BEGIN/END PRIVATE KEY-----` → `[REDACTED]`
+- **Audit logging**: All redaction events are logged with file path, redaction count, and patterns matched
+- **Zero configuration**: Enabled by default, no setup required
+
+**Example - Reading MCP Config**:
+```json
+// Original file content (configs/antigravity.json):
+{
+  "SYTRA_ADMIN_PASSWORD": "mysecretpassword123",
+  "api_key": "sk-1234567890abcdef"
+}
+
+// What the agent sees (automatically redacted):
+{
+  "SYTRA_ADMIN_PASSWORD": "[REDACTED]",
+  "api_key": "[REDACTED]"
+}
+```
+
 ### Workspace Boundary Enforcement
 - All file paths validated against workspace directory
 - Path traversal attempts blocked (`../`, symlinks outside workspace)
@@ -112,6 +141,7 @@ Edit Windsurf settings:
 ### Security Guardrails
 - Dangerous operations blocked (delete, rm -rf, sudo, chmod 777)
 - Sensitive files protected (.env, .key, credentials.*)
+- MCP config files protected (configs/*.json)
 - All operations logged in audit trail
 
 ### Admin Authentication
@@ -171,9 +201,65 @@ Edit `mcp-servers/orchestrator/security-config.json`:
 {
   "workspaceOnly": true,
   "requirePasswordFor": ["delete", "execute_command"],
-  "sensitiveFilePatterns": [".env*", "*.key", "credentials.*"],
+  "sensitiveFilePatterns": [
+    ".env*",
+    "*.key",
+    "credentials.*",
+    "**/configs/*.json",
+    "**/*config*.json"
+  ],
   "dangerousOperations": ["delete", "rm", "sudo"],
-  "systemPaths": ["/etc", "/sys", "/proc", "C:\\Windows"]
+  "systemPaths": ["/etc", "/sys", "/proc", "C:\\Windows"],
+  "credentialRedaction": {
+    "enabled": true,
+    "patterns": [
+      "password",
+      "token",
+      "api_key",
+      "apiKey",
+      "secret",
+      "SYTRA_ADMIN_PASSWORD",
+      "AWS_SECRET_ACCESS_KEY",
+      "private_key"
+    ],
+    "filePatterns": [
+      "**/configs/*.json",
+      "**/*config*.json",
+      "**/.env*",
+      "**/credentials*",
+      "**/*.pem",
+      "**/*.key"
+    ]
+  }
+}
+```
+
+### Credential Redaction Configuration
+
+- **enabled**: Enable/disable automatic credential redaction (default: `true`)
+- **patterns**: List of credential field names to redact (case-insensitive matching)
+- **filePatterns**: Glob patterns for files that should have credentials redacted
+
+**To disable credential redaction** (not recommended):
+```json
+{
+  "credentialRedaction": {
+    "enabled": false
+  }
+}
+```
+
+**To add custom patterns**:
+```json
+{
+  "credentialRedaction": {
+    "enabled": true,
+    "patterns": [
+      "password",
+      "my_custom_secret",
+      "internal_token"
+    ]
+  }
 }
 ```
 

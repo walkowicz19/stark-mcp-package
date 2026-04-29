@@ -8,7 +8,7 @@
       "env": {
         "WORKFLOWS_DIR": "/absolute/path/to/sytra-mcp/mcp-servers/orchestrator/workflows",
         "WORKSPACE_DIR": "/absolute/path/to/your/project",
-        "SYTRA_ADMIN_PASSWORD": "your-secure-password-here",
+        "SYTRA_ADMIN_PASSWORD": "Admin12345@",
         "SECURITY_API_URL": "http://localhost:8001",
         "CODEGEN_API_URL": "http://localhost:8002",
         "MEMORY_API_URL": "http://localhost:8003",

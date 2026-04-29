@@ -6,6 +6,7 @@
 import { getSecurityGuardrails, GuardrailResult } from './guardrails.js';
 import { getWorkspaceValidator, ValidationResult } from './workspace-validator.js';
 import { getAdminAuth } from './auth.js';
+import { getCredentialRedactor, RedactionResult } from './credential-redactor.js';
 import { logger } from '../utils/logger.js';
 
 export interface SecurityCheckResult {
@@ -14,6 +15,8 @@ export interface SecurityCheckResult {
   requiresAuth?: boolean;
   authPrompt?: string;
   severity?: 'low' | 'medium' | 'high' | 'critical';
+  redacted?: boolean;
+  redactionInfo?: RedactionResult;
 }
 
 export class SecurityMiddleware {
@@ -40,6 +43,16 @@ export class SecurityMiddleware {
         workspaceOnly: config.securityConfig.workspaceOnly,
         requirePasswordFor: config.securityConfig.requirePasswordFor,
       });
+
+      // Initialize credential redactor
+      if (config.securityConfig.credentialRedaction) {
+        getCredentialRedactor({
+          enabled: config.securityConfig.credentialRedaction.enabled,
+          patterns: config.securityConfig.credentialRedaction.patterns,
+          filePatterns: config.securityConfig.credentialRedaction.filePatterns,
+        });
+        logger.info('Credential redaction initialized');
+      }
 
       // Initialize admin auth
       const auth = getAdminAuth(config.securityConfig.rateLimiting);
@@ -244,6 +257,68 @@ export class SecurityMiddleware {
     details?: any;
   }): void {
     logger.info('Security event', event);
+  }
+
+  /**
+   * Redact credentials from file content
+   */
+  redactFileContent(content: string, filePath: string): RedactionResult {
+    try {
+      const redactor = getCredentialRedactor();
+      return redactor.redactContent(content, filePath);
+    } catch (error) {
+      logger.error('Failed to redact file content', error as Error, { filePath });
+      // Return original content if redaction fails
+      return {
+        content,
+        redacted: false,
+        redactionCount: 0,
+        patterns: [],
+      };
+    }
+  }
+
+  /**
+   * Check if a file should be redacted
+   */
+  shouldRedactFile(filePath: string): boolean {
+    try {
+      const redactor = getCredentialRedactor();
+      return redactor.shouldRedactFile(filePath);
+    } catch (error) {
+      logger.error('Failed to check if file should be redacted', error as Error, { filePath });
+      return false;
+    }
+  }
+
+  /**
+   * Get redaction statistics
+   */
+  getRedactionStats(): any {
+    try {
+      const redactor = getCredentialRedactor();
+      return redactor.getStatistics();
+    } catch (error) {
+      logger.error('Failed to get redaction stats', error as Error);
+      return {
+        totalRedactions: 0,
+        filesRedacted: 0,
+        mostCommonPatterns: [],
+      };
+    }
+  }
+
+  /**
+   * Get redaction log
+   */
+  getRedactionLog(limit?: number): any[] {
+    try {
+      const redactor = getCredentialRedactor();
+      return redactor.getRedactionLog(limit);
+    } catch (error) {
+      logger.error('Failed to get redaction log', error as Error);
+      return [];
+    }
   }
 }
 
