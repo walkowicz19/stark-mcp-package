@@ -90,7 +90,7 @@ function build_server() {
 START_TIME=$(date +%s)
 
 print_color "$CYAN" "\n========================================"
-print_color "$CYAN" "  STARK MCP SERVERS SETUP SCRIPT"
+print_color "$CYAN" "  SYTRA MCP SERVERS SETUP SCRIPT"
 print_color "$CYAN" "========================================\n"
 
 check_prerequisites
