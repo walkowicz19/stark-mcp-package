@@ -7,9 +7,21 @@ router.get('/', (req, res) => {
     const { db } = req.app.locals;
     const models = db.getAllModelConfigs();
     
+    // Get available models
+    const availableModels = [
+      { id: 'gpt-4', name: 'GPT-4', description: 'Most capable GPT-4 model' },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Faster and cheaper GPT-4' },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and efficient' },
+      { id: 'claude-3-opus', name: 'Claude 3 Opus', description: 'Most capable Claude model' },
+      { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: 'Balanced performance' },
+      { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: 'Fast and affordable' },
+      { id: 'claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', description: 'Latest Claude model' }
+    ];
+    
     res.json({
       success: true,
-      data: models,
+      models: models,
+      available: availableModels,
       count: models.length
     });
   } catch (error) {

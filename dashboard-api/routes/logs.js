@@ -1,6 +1,31 @@
 const express = require('express');
 const router = express.Router();
 
+// Get all logs (combined)
+router.get('/', (req, res) => {
+  try {
+    const { db } = req.app.locals;
+    const limit = parseInt(req.query.limit) || 100;
+    const level = req.query.level;
+    
+    const filters = { limit };
+    if (level) filters.level = level;
+    
+    const logs = db.getMCPLogs(filters);
+    
+    res.json({
+      success: true,
+      logs: logs,
+      count: logs.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Get MCP server logs
 router.get('/mcp', (req, res) => {
   try {
@@ -16,7 +41,7 @@ router.get('/mcp', (req, res) => {
     
     res.json({
       success: true,
-      data: logs,
+      logs: logs,
       count: logs.length
     });
   } catch (error) {
@@ -42,7 +67,7 @@ router.get('/commands', (req, res) => {
     
     res.json({
       success: true,
-      data: logs,
+      logs: logs,
       count: logs.length
     });
   } catch (error) {
@@ -108,7 +133,7 @@ router.get('/hallucinations', (req, res) => {
     
     res.json({
       success: true,
-      data: logs,
+      logs: logs,
       count: logs.length
     });
   } catch (error) {

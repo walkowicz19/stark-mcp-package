@@ -1,11 +1,20 @@
-const Database = require('better-sqlite3');
+const SqlJsAdapter = require('./sqlite-adapter');
 const path = require('path');
 const crypto = require('crypto');
 
 class DashboardDatabase {
   constructor(dbPath = path.join(__dirname, 'dashboard.db')) {
-    this.db = new Database(dbPath);
+    this.db = new SqlJsAdapter(dbPath);
+    this.initPromise = this.initialize();
+  }
+
+  async initialize() {
+    await this.db.init();
     this.initializeTables();
+  }
+
+  async ensureInitialized() {
+    await this.initPromise;
   }
 
   initializeTables() {

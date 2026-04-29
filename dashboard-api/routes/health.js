@@ -19,6 +19,27 @@ router.get('/', (req, res) => {
   }
 });
 
+// Get health status (summary + servers)
+router.get('/status', (req, res) => {
+  try {
+    const { mcpMonitor } = req.app.locals;
+    const summary = mcpMonitor.getHealthSummary();
+    const servers = mcpMonitor.getAllStatus();
+    
+    res.json({
+      success: true,
+      summary,
+      servers,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Get all server statuses
 router.get('/servers', (req, res) => {
   try {

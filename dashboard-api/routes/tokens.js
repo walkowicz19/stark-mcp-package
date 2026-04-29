@@ -4,14 +4,24 @@ const router = express.Router();
 // Get token usage statistics
 router.get('/stats', (req, res) => {
   try {
-    const { tokenTracker } = req.app.locals;
+    const { db } = req.app.locals;
     const period = req.query.period || '24h';
     
-    const stats = tokenTracker.getUsageStats(period);
+    const stats = db.getTokenStats(period);
+    
+    // Calculate summary
+    const summary = {
+      total_tokens: stats.reduce((sum, s) => sum + (s.total_tokens || 0), 0),
+      total_cost: stats.reduce((sum, s) => sum + (s.total_cost || 0), 0),
+      request_count: stats.reduce((sum, s) => sum + (s.request_count || 0), 0)
+    };
     
     res.json({
       success: true,
-      data: stats
+      summary,
+      by_model: stats,
+      timeline: [], // Would need to implement timeline data
+      period
     });
   } catch (error) {
     res.status(500).json({

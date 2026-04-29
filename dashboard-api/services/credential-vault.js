@@ -8,14 +8,16 @@ const ADMIN_PASSWORD_FILE = path.join(SYTRA_DIR, 'admin.hash');
 
 class CredentialVault {
   constructor(masterKey = null) {
-    // Use environment variable or generate a master key
-    this.masterKey = masterKey || process.env.MASTER_KEY || this.generateMasterKey();
+    // Set constants first
     this.algorithm = 'aes-256-gcm';
     this.keyLength = 32; // 256 bits
     this.ivLength = 16; // 128 bits
     this.saltLength = 64;
     this.tagLength = 16;
     this.sessionTokens = new Map(); // Store session tokens in memory
+    
+    // Use environment variable or generate a master key (after keyLength is set)
+    this.masterKey = masterKey || process.env.MASTER_KEY || this.generateMasterKey();
     
     // Ensure .sytra directory exists
     this.ensureSytraDir();

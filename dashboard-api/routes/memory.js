@@ -177,24 +177,27 @@ router.get('/graph', (req, res) => {
     const graphData = {
       nodes: nodes.map(node => ({
         id: node.node_id,
+        node_id: node.node_id,
         label: node.type,
         type: node.type,
-        content: node.content.substring(0, 100) + (node.content.length > 100 ? '...' : ''),
+        content: node.content,
         access_count: node.access_count,
         created_at: node.created_at,
         updated_at: node.updated_at
       })),
-      edges: relationships.map(rel => ({
+      relationships: relationships.map(rel => ({
         source: rel.source_node_id,
         target: rel.target_node_id,
-        label: rel.relationship_type,
+        source_node_id: rel.source_node_id,
+        target_node_id: rel.target_node_id,
+        relationship_type: rel.relationship_type,
         weight: rel.weight
       }))
     };
     
     res.json({
       success: true,
-      data: graphData
+      ...graphData
     });
   } catch (error) {
     res.status(500).json({
@@ -259,28 +262,28 @@ router.get('/stats', (req, res) => {
     
     nodes.forEach(node => {
       typeCount[node.type] = (typeCount[node.type] || 0) + 1;
-      totalAccessCount += node.access_count;
+      totalAccessCount += node.access_count || 0;
     });
     
     const stats = {
       total_nodes: nodes.length,
       total_relationships: relationships.length,
-      total_access_count: totalAccessCount,
-      avg_access_per_node: nodes.length > 0 ? totalAccessCount / nodes.length : 0,
+      total_access: totalAccessCount,
+      avg_access: nodes.length > 0 ? totalAccessCount / nodes.length : 0,
       nodes_by_type: typeCount,
       most_accessed: nodes
-        .sort((a, b) => b.access_count - a.access_count)
+        .sort((a, b) => (b.access_count || 0) - (a.access_count || 0))
         .slice(0, 10)
         .map(node => ({
           node_id: node.node_id,
           type: node.type,
-          access_count: node.access_count
+          access_count: node.access_count || 0
         }))
     };
     
     res.json({
       success: true,
-      data: stats
+      ...stats
     });
   } catch (error) {
     res.status(500).json({

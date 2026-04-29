@@ -6,15 +6,15 @@ class MCPMonitor {
     
     // MCP server configurations
     this.servers = {
-      'code-generation': { port: 8001, name: 'Code Generation' },
-      'intelligence-amplification': { port: 8002, name: 'Intelligence Amplification' },
-      'legacy-support': { port: 8003, name: 'Legacy Support' },
-      'memory-management': { port: 8004, name: 'Memory Management' },
-      'performance-optimizer': { port: 8005, name: 'Performance Optimizer' },
-      'schema-intelligence': { port: 8006, name: 'Schema Intelligence' },
-      'sdlc-integration': { port: 8007, name: 'SDLC Integration' },
-      'security-guardrails': { port: 8008, name: 'Security Guardrails' },
-      'token-optimization': { port: 8009, name: 'Token Optimization' }
+      'security': { port: 8001, name: 'Security Guardrails' },
+      'codegen': { port: 8002, name: 'Code Generation' },
+      'memory': { port: 8003, name: 'Memory Management' },
+      'intelligence': { port: 8004, name: 'Intelligence Amplification' },
+      'tokens': { port: 8005, name: 'Token Optimization' },
+      'sdlc': { port: 8006, name: 'SDLC Integration' },
+      'legacy': { port: 8007, name: 'Legacy Support' },
+      'schema': { port: 8008, name: 'Schema Intelligence' },
+      'performance': { port: 8009, name: 'Performance Optimizer' }
     };
 
     // Server status cache

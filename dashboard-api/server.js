@@ -31,19 +31,24 @@ const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'localhost';
 
-// Initialize services
-const db = new DashboardDatabase();
-const vault = new CredentialVault();
-const tokenTracker = new TokenTracker(db);
-const hallucinationDetector = new HallucinationDetector(db);
-const mcpMonitor = new MCPMonitor(db);
+// Initialize services (async initialization)
+let db, vault, tokenTracker, hallucinationDetector, mcpMonitor;
 
-// Store services in app for access in routes
-app.locals.db = db;
-app.locals.vault = vault;
-app.locals.tokenTracker = tokenTracker;
-app.locals.hallucinationDetector = hallucinationDetector;
-app.locals.mcpMonitor = mcpMonitor;
+async function initializeServices() {
+  db = new DashboardDatabase();
+  await db.ensureInitialized();
+  vault = new CredentialVault();
+  tokenTracker = new TokenTracker(db);
+  hallucinationDetector = new HallucinationDetector(db);
+  mcpMonitor = new MCPMonitor(db);
+  
+  // Store services in app for access in routes (after initialization)
+  app.locals.db = db;
+  app.locals.vault = vault;
+  app.locals.tokenTracker = tokenTracker;
+  app.locals.hallucinationDetector = hallucinationDetector;
+  app.locals.mcpMonitor = mcpMonitor;
+}
 
 // Middleware
 app.use(helmet({
@@ -393,8 +398,6 @@ app.use((req, res) => {
   }
 });
 
-// Start MCP monitoring
-mcpMonitor.startMonitoring();
 
 // Cleanup on shutdown
 process.on('SIGINT', () => {
@@ -418,29 +421,45 @@ process.on('SIGINT', () => {
   });
 });
 
-// Start server
-server.listen(PORT, HOST, () => {
-  console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║                                                            ║');
-  console.log('║          Sytra MCP Dashboard API Server                   ║');
-  console.log('║                                                            ║');
-  console.log('╚════════════════════════════════════════════════════════════╝');
-  console.log('');
-  console.log(`🚀 Server running at http://${HOST}:${PORT}`);
-  console.log(`📊 Dashboard: http://${HOST}:${PORT}`);
-  console.log(`🔌 API: http://${HOST}:${PORT}/api`);
-  console.log(`📡 WebSocket: ws://${HOST}:${PORT}`);
-  console.log('');
-  console.log('Services initialized:');
-  console.log('  ✓ Database (SQLite)');
-  console.log('  ✓ Credential Vault');
-  console.log('  ✓ Token Tracker');
-  console.log('  ✓ Hallucination Detector');
-  console.log('  ✓ MCP Monitor');
-  console.log('');
-  console.log('Press Ctrl+C to stop');
-  console.log('');
-});
+// Start server with async initialization
+async function startServer() {
+  try {
+    // Initialize services first
+    await initializeServices();
+    
+    // Start MCP monitoring
+    mcpMonitor.startMonitoring();
+    
+    // Start server
+    server.listen(PORT, HOST, () => {
+      console.log('╔════════════════════════════════════════════════════════════╗');
+      console.log('║                                                            ║');
+      console.log('║          Sytra MCP Dashboard API Server                   ║');
+      console.log('║                                                            ║');
+      console.log('╚════════════════════════════════════════════════════════════╝');
+      console.log('');
+      console.log(`🚀 Server running at http://${HOST}:${PORT}`);
+      console.log(`📊 Dashboard: http://${HOST}:${PORT}`);
+      console.log(`🔌 API: http://${HOST}:${PORT}/api`);
+      console.log(`📡 WebSocket: ws://${HOST}:${PORT}`);
+      console.log('');
+      console.log('Services initialized:');
+      console.log('  ✓ Database (SQLite with sql.js)');
+      console.log('  ✓ Credential Vault');
+      console.log('  ✓ Token Tracker');
+      console.log('  ✓ Hallucination Detector');
+      console.log('  ✓ MCP Monitor');
+      console.log('');
+      console.log('Press Ctrl+C to stop');
+      console.log('');
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 module.exports = { app, server, wss };
 
