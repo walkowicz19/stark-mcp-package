@@ -17,6 +17,9 @@ COPY shared /app/shared
 # Copy service code
 COPY codegen /app/codegen
 
+# Set Python path to include /app so shared module can be imported
+ENV PYTHONPATH=/app
+
 WORKDIR /app/codegen
 
 # Expose port

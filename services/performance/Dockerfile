@@ -17,6 +17,9 @@ COPY shared /app/shared
 # Copy service code
 COPY performance /app/performance
 
+# Set Python path to include /app so shared module can be imported
+ENV PYTHONPATH=/app
+
 WORKDIR /app/performance
 
 # Expose port

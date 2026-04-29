@@ -17,6 +17,9 @@ COPY shared /app/shared
 # Copy service code
 COPY schema /app/schema
 
+# Set Python path to include /app so shared module can be imported
+ENV PYTHONPATH=/app
+
 WORKDIR /app/schema
 
 # Expose port

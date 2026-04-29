@@ -17,6 +17,9 @@ COPY shared /app/shared
 # Copy service code
 COPY legacy /app/legacy
 
+# Set Python path to include /app so shared module can be imported
+ENV PYTHONPATH=/app
+
 WORKDIR /app/legacy
 
 # Expose port

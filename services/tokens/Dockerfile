@@ -17,6 +17,9 @@ COPY shared /app/shared
 # Copy service code
 COPY tokens /app/tokens
 
+# Set Python path to include /app so shared module can be imported
+ENV PYTHONPATH=/app
+
 WORKDIR /app/tokens
 
 # Expose port

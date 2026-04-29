@@ -15,15 +15,15 @@ RUN pip install --no-cache-dir -r shared/requirements.txt
 COPY shared /app/shared
 
 # Copy service code
-COPY memory /app/memory
+COPY security /app/security
 
 # Set Python path to include /app so shared module can be imported
 ENV PYTHONPATH=/app
 
-WORKDIR /app/memory
+WORKDIR /app/security
 
 # Expose port
-EXPOSE 8003
+EXPOSE 8001
 
 # Run service
 CMD ["python", "main.py"]
