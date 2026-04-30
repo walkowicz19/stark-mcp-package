@@ -98,6 +98,8 @@ All configurations require updating file paths to match your installation direct
 
 - Node.js 18+
 - TypeScript 5.3+
+- Docker Desktop or Docker Engine
+- Docker Compose / `docker compose` for running the Sytra backend services required by orchestrated and service-backed MCP servers
 
 ## Documentation
 
@@ -112,9 +114,10 @@ All configurations require updating file paths to match your installation direct
 ## Getting Started
 
 1. **Install**: Follow the [Installation Guide](INSTALLATION.md) to set up all servers
-2. **Verify**: Use the [Testing Guide](TESTING.md) to confirm everything works
-3. **Learn**: Explore the [Usage Guide](USAGE_GUIDE.md) for practical examples
-4. **Troubleshoot**: Check the [Troubleshooting Guide](TROUBLESHOOTING.md) if issues arise
+2. **Start backend services**: Run the Sytra services with Docker Compose from `../services/`
+3. **Verify**: Use the [Testing Guide](TESTING.md) to confirm everything works
+4. **Learn**: Explore the [Usage Guide](USAGE_GUIDE.md) for practical examples
+5. **Troubleshoot**: Check the [Troubleshooting Guide](TROUBLESHOOTING.md) if issues arise
 
 ## Support
 

@@ -29,21 +29,25 @@ The Sytra system consists of:
 ### Prerequisites
 
 - Python 3.9+
-- Docker and Docker Compose (recommended)
+- Docker Desktop or Docker Engine
+- Docker Compose / `docker compose` (recommended for running all Sytra backend services together)
 - OR: Python virtual environment
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Docker Compose (Recommended for servers and services runtime)
 
 ```bash
 # Start all services
 cd services
-docker-compose up -d
+docker compose up -d
+# or: docker-compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
+# or: docker-compose logs -f
 
 # Stop all services
-docker-compose down
+docker compose down
+# or: docker-compose down
 ```
 
 ### Option 2: Manual Setup
@@ -236,20 +240,20 @@ See [`../SECURITY_IMPLEMENTATION.md`](../SECURITY_IMPLEMENTATION.md) for detaile
 
 ```bash
 # Check logs
-docker-compose logs security
+docker compose logs security
 
 # Check if port is in use
 netstat -an | grep 8001
 
 # Restart service
-docker-compose restart security
+docker compose restart security
 ```
 
 ### Import errors
 
 ```bash
 # Rebuild containers
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Or reinstall dependencies
 pip install -r shared/requirements.txt --force-reinstall
@@ -259,7 +263,7 @@ pip install -r shared/requirements.txt --force-reinstall
 
 ```bash
 # Verify service is running
-docker-compose ps
+docker compose ps
 
 # Check network
 docker network ls

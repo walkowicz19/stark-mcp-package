@@ -226,6 +226,8 @@ Coordinate complex multi-service workflows:
 
 - **Node.js** 20.0 or higher
 - **npm** or **yarn**
+- **Docker Desktop** (recommended for running Sytra backend services and supporting containers)
+- **Docker Compose** / `docker compose` (recommended for running all backend services together)
 - **MCP-compatible client**: Claude Desktop, VSCode (Continue), Cursor, Windsurf, Zed, IBM Bob, Antigravity, or Kiro
 
 ### Multi-IDE Support
@@ -281,7 +283,7 @@ The script will:
 
 #### Option 2: Orchestrator Only
 
-Install just the orchestrator (requires backend services running):
+Install just the orchestrator (requires backend services running, typically via Docker):
 
 ```bash
 # Clone the repository
@@ -295,7 +297,7 @@ npm install
 npm run build
 ```
 
-**⚠️ Important:** The orchestrator requires the Sytra backend services to be running. It coordinates calls to specialized services but doesn't include their implementation.
+**⚠️ Important:** The orchestrator requires the Sytra backend services to be running. The recommended way to start them is with Docker Compose from the `services/` directory. It coordinates calls to specialized services but doesn't include their implementation.
 
 #### Option 3: Individual Servers
 
@@ -353,7 +355,7 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-**⚠️ Note:** The orchestrator requires backend services to be running. Make sure all required services are started before using the orchestrator.
+**⚠️ Note:** The orchestrator requires backend services to be running. Start them with Docker Compose from `services/` before using the orchestrator.
 
 **Individual Server Configuration (Standalone):**
 ```json

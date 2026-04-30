@@ -10,6 +10,8 @@ The full dashboard requires the dashboard-api backend server with native depende
 
 **Prerequisites:**
 - Node.js 16+ and npm
+- Docker Desktop or Docker Engine (recommended when running the full Sytra stack, including backend services)
+- Docker Compose / `docker compose` (recommended for starting Sytra backend services alongside the dashboard)
 - **C++ Build Tools** (required for native dependencies):
   - **Windows**: Visual Studio Build Tools with "Desktop development with C++"
   - **Linux**: build-essential package (`sudo apt-get install build-essential`)
@@ -176,6 +178,8 @@ The static dashboard provides basic functionality without backend integration:
 ### Prerequisites
 - Node.js 16+ and npm
 - Git
+- Docker Desktop or Docker Engine (recommended for the full Sytra environment)
+- Docker Compose / `docker compose` (recommended to run Sytra backend services)
 
 ### Setup Steps
 
